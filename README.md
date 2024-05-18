@@ -35,6 +35,7 @@ This project demonstrates a data ingestion and transformation pipeline that extr
 
 - Docker
 - Docker Compose
+- Poetry (for dependency management and packaging)
 
 ### Steps to Execute
 
@@ -45,7 +46,13 @@ This project demonstrates a data ingestion and transformation pipeline that extr
     cd data-engineer-cloudwalk
     ```
 
-2. **Build and run the Docker containers:**
+2. **Install dependencies using Poetry:**
+
+    ```bash
+    poetry install
+    ```
+
+3. **Build and run the Docker containers:**
 
     ```bash
     docker-compose up --build -d
@@ -57,7 +64,7 @@ This project demonstrates a data ingestion and transformation pipeline that extr
     - Start the pgAdmin container.
     - Run the ETL process in the application container.
 
-3. **Access pgAdmin:**
+4. **Access pgAdmin:**
 
     After running the containers, pgAdmin will be available at `http://localhost:5050`.
 
