@@ -2,43 +2,56 @@ import json
 import psycopg2
 
 def load_data(filename='gdp_data.json'):
-    with open(filename, 'r') as f:
+    with open(filename, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 def connect_db():
-    return psycopg2.connect(
-        dbname='gdp_data',
-        user='postgres',
-        password='postgres',
-        host='db'
-    )
+    try:
+        conn = psycopg2.connect(
+            dbname='gdp_data',
+            user='postgres',
+            password='postgres',
+            host='db'
+        )
+        return conn
+    except Exception as e:
+        print(f"Error connecting to the database: {e}")
+        raise
 
 def create_tables(conn):
-    with conn.cursor() as cur:
-        cur.execute(open('init_db.sql', 'r').read())
-    conn.commit()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(open('db/init_db.sql', 'r', encoding='utf-8').read())
+        conn.commit()
+    except Exception as e:
+        print(f"Error creating tables: {e}")
+        raise
 
 def insert_data(conn, data):
-    with conn.cursor() as cur:
-        for entry in data[1]:
-            country_id = entry['country']['id']
-            country_name = entry['country']['value']
-            iso3_code = entry['countryiso3code']
-            year = entry['date']
-            value = entry['value']
+    try:
+        with conn.cursor() as cur:
+            for entry in data[1]:
+                country_id = entry['country']['id']
+                country_name = entry['country']['value']
+                iso3_code = entry['countryiso3code']
+                year = entry['date']
+                value = entry['value']
 
-            cur.execute("""
-                INSERT INTO country (id, name, iso3_code)
-                VALUES (%s, %s, %s)
-                ON CONFLICT (id) DO NOTHING;
-            """, (country_id, country_name, iso3_code))
+                cur.execute("""
+                    INSERT INTO country (id, name, iso3_code)
+                    VALUES (%s, %s, %s)
+                    ON CONFLICT (id) DO NOTHING;
+                """, (country_id, country_name, iso3_code))
 
-            cur.execute("""
-                INSERT INTO gdp (country_id, year, value)
-                VALUES (%s, %s, %s)
-                ON CONFLICT (country_id, year) DO NOTHING;
-            """, (country_id, year, value))
-    conn.commit()
+                cur.execute("""
+                    INSERT INTO gdp (country_id, year, value)
+                    VALUES (%s, %s, %s)
+                    ON CONFLICT (country_id, year) DO NOTHING;
+                """, (country_id, year, value))
+        conn.commit()
+    except Exception as e:
+        print(f"Error inserting data: {e}")
+        raise
 
 if __name__ == '__main__':
     data = load_data()
