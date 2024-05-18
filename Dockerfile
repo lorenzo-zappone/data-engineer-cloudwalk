@@ -16,8 +16,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application files
 COPY . .
 
-# Ensure the run.sh script is executable
+# Ensure the run.sh and setup_pgadmin.sh script is executable
+RUN chmod +x pgadmin/setup_pgadmin.sh
 RUN chmod +x /app/run.sh
+
 
 # Use CMD to run the run.sh script
 CMD ["./run.sh"]

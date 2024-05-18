@@ -21,7 +21,13 @@ def connect_db():
 def create_tables(conn):
     try:
         with conn.cursor() as cur:
-            cur.execute(open('db/init_db.sql', 'r', encoding='utf-8').read())
+            # Open and read the SQL script using Python's built-in file handling
+            with open('db/init_db.sql', 'r', encoding='utf-8') as sql_file:
+                sql_script = sql_file.read()
+
+            # Execute the SQL script
+            cur.execute(sql_script)
+            
         conn.commit()
     except Exception as e:
         print(f"Error creating tables: {e}")
@@ -30,7 +36,7 @@ def create_tables(conn):
 def insert_data(conn, data):
     try:
         with conn.cursor() as cur:
-            for entry in data[1]:
+            for entry in data:
                 country_id = entry['country']['id']
                 country_name = entry['country']['value']
                 iso3_code = entry['countryiso3code']
@@ -48,6 +54,7 @@ def insert_data(conn, data):
                     VALUES (%s, %s, %s)
                     ON CONFLICT (country_id, year) DO NOTHING;
                 """, (country_id, year, value))
+                
         conn.commit()
     except Exception as e:
         print(f"Error inserting data: {e}")
