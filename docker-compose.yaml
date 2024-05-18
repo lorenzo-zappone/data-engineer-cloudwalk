@@ -18,10 +18,7 @@ services:
       - db
     volumes:
       - .:/app
-    command: >
-      bash -c "python scripts/extract.py &&
-               python scripts/load.py &&
-               psql -h db -U postgres -d gdp_data -f scripts/transform.sql"
+    command: ["./run.sh"]
     environment:
       PGPASSWORD: postgres
 
@@ -31,11 +28,12 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
-      - "5050:5050"
+      - "5050:80"
     depends_on:
       - db
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/setup_pgadmin.sh:/docker-entrypoint-initdb.d/setup_pgadmin.sh
 
 volumes:
   db_data:
