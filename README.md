@@ -1,4 +1,4 @@
-# GDP Data Ingestion and Transformation Pipeline
+# GDP Data Pipeline
 
 ## Introduction
 
@@ -6,28 +6,19 @@ This project demonstrates a data ingestion and transformation pipeline that extr
 
 ## Project Structure
 
-
+``` php	
     ├── db
-    
-       └── init_db.sql # SQL script to initialize the database schema
-    
+        └── init_db.sql # SQL script to initialize the database schema
     ├── scripts
-    
-       ├── extract.py # Script to extract data from the World Bank API
-    
-       ├── load.py # Script to load data into the PostgreSQL database
-    
-       └── transform.sql # SQL script to create the pivoted view
-    
+        ├── extract.py # Script to extract data from the World Bank API
+        ├── load.py # Script to load data into the PostgreSQL database
+        └── transform.sql # SQL script to create the pivoted view
     ├── Dockerfile # Dockerfile for the application
-    
     ├── docker-compose.yml # Docker Compose file to orchestrate services
-    
     ├── requirements.txt # Python dependencies
-    
     ├── run.sh # Shell script to run the entire ETL process
-    
     └── README.md # Project documentation
+```	
 
 ## Setup and Execution
 
@@ -36,8 +27,37 @@ This project demonstrates a data ingestion and transformation pipeline that extr
 - Docker
 - Docker Compose
 - Poetry (for dependency management and packaging)
+- pgAdmin
+- Astro CLI **
 
-### Steps to Execute
+### Installing Prerequisites
+
+**Docker and Docker Compose:**
+Follow the installation instructions for your OS on the [Docker website](https://docs.docker.com/get-docker/).
+
+**Poetry:**
+Follow the installation instructions on the [Poetry website](https://python-poetry.org/docs/#installation).
+
+****Optional step - Astro CLI:**
+Follow the installation instructions for your OS:
+
+- **Windows:**
+    ```bash
+    powershell -Command "Invoke-WebRequest -Uri https://install.astronomer.io/astro-cli-install.ps1 -OutFile install.ps1; ./install.ps1"
+    ```
+
+- **MacOS:**
+    ```bash
+    brew install astro
+    ```
+
+- **Linux:**
+    ```bash
+    curl -sSL https://install.astronomer.io | sudo bash
+    ```
+---
+
+## Steps to Execute
 
 1. **Clone the repository:**
 
@@ -71,7 +91,26 @@ This project demonstrates a data ingestion and transformation pipeline that extr
     - **Email:** `admin@admin.com`
     - **Password:** `admin`
 
-    You can use pgAdmin to verify the data in the PostgreSQL database.
+5. **Validate the tables in the database:**
+
+    - Log in to pgAdmin.
+    - Connect to the PostgreSQL server using the credentials provided in the `docker-compose.yml` file.
+    - Verify that the `country` and `gdp` tables are created and populated.
+
+## Optional configuration
+6. **Navigate to the Airflow folder:**
+
+    ```bash
+    cd airflow
+    ```
+
+7. **Start Airflow using Astro CLI:**
+
+    ```bash
+    astro dev start
+    ```
+
+    - Open your browser and go to `http://localhost:8080` to access the Airflow web UI.
 
 ## Design Decisions and Assumptions
 
@@ -89,15 +128,142 @@ This project demonstrates a data ingestion and transformation pipeline that extr
 
 2. **Data Extraction:**
    - The `extract.py` script fetches GDP data from the World Bank API and saves it to a local JSON file.
+   
+```python
+    import requests
+    import json
+
+    def extract_data():
+        base_url = "https://api.worldbank.org/v2/country/"
+        countries = ["ARG", "BOL", "BRA", "CHL", "COL", "ECU", "GUY", "PRY", "PER", "SUR", "URY", "VEN"]
+        indicator = "NY.GDP.MKTP.CD"
+        data = []
+
+        for country in countries:
+            page = 1
+            while True:
+                url = f"{base_url}{country}/indicator/{indicator}?format=json&page={page}&per_page=50"
+                response = requests.get(url)
+                json_data = response.json()
+
+                if not json_data:
+                    break
+
+                data.extend(json_data[1])
+
+                if len(json_data[1]) < 50:
+                    break
+
+                page += 1
+
+        return data
+
+if __name__ == "__main__":
+    data = extract_data()
+    with open("gdp_data.json", "w") as f:
+        json.dump(data, f)
+```
 
 3. **Data Loading:**
    - The `load.py` script reads the JSON data and inserts it into the PostgreSQL database. It handles potential conflicts by using `ON CONFLICT` clauses.
 
+```python
+import json
+import psycopg2
+
+def load_data(filename='gdp_data.json'):
+    with open(filename, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+def connect_db():
+    try:
+        conn = psycopg2.connect(
+            dbname='gdp_data',
+            user='cloudwalk',
+            password='EzOiDSqfrdy5cbkXhr2LQHN6eB1SzE3O',
+            host='dpg-cp4lc5779t8c73ei01pg-a.oregon-postgres.render.com'
+        )
+        return conn
+    except Exception as e:
+        print(f"Error connecting to the database: {e}")
+        raise
+
+def create_tables(conn):
+    try:
+        with conn.cursor() as cur:
+            # Open and read the SQL script using Python's built-in file handling
+            with open('db/init_db.sql', 'r', encoding='utf-8') as sql_file:
+                sql_script = sql_file.read()
+
+            # Execute the SQL script
+            cur.execute(sql_script)
+            
+        conn.commit()
+    except Exception as e:
+        print(f"Error creating tables: {e}")
+        raise
+
+def insert_data(conn, data):
+    try:
+        with conn.cursor() as cur:
+            for entry in data:
+                country_id = entry['country']['id']
+                country_name = entry['country']['value']
+                iso3_code = entry['countryiso3code']
+                year = entry['date']
+                value = entry['value']
+
+                cur.execute("""
+                    INSERT INTO country (id, name, iso3_code)
+                    VALUES (%s, %s, %s)
+                    ON CONFLICT (id) DO NOTHING;
+                """, (country_id, country_name, iso3_code))
+
+                cur.execute("""
+                    INSERT INTO gdp (country_id, year, value)
+                    VALUES (%s, %s, %s)
+                    ON CONFLICT (country_id, year) DO NOTHING;
+                """, (country_id, year, value))
+                    
+        conn.commit()
+    except Exception as e:
+        print(f"Error inserting data: {e}")
+        raise
+
+if __name__ == '__main__':
+    data = load_data()
+    conn = connect_db()
+    create_tables(conn)
+    insert_data(conn, data)
+    conn.close()
+```
+
 4. **Data Transformation:**
    - The `transform.sql` script creates a pivoted view `pivoted_gdp` to facilitate reporting. This view presents the last 5 years' GDP values in billions.
 
+```sql
+CREATE VIEW pivoted_gdp AS
+SELECT
+    country.id,
+    country.name,
+    country.iso3_code,
+    ROUND(MAX(CASE WHEN gdp.year = 2019 THEN gdp.value / 1e9 END), 2) AS "2019",
+    ROUND(MAX(CASE WHEN gdp.year = 2020 THEN gdp.value / 1e9 END), 2) AS "2020",
+    ROUND(MAX(CASE WHEN gdp.year = 2021 THEN gdp.value / 1e9 END), 2) AS "2021",
+    ROUND(MAX(CASE WHEN gdp.year = 2022 THEN gdp.value / 1e9 END), 2) AS "2022",
+    ROUND(MAX(CASE WHEN gdp.year = 2023 THEN gdp.value / 1e9 END), 2) AS "2023"
+FROM
+    country
+JOIN
+    gdp ON country.id = gdp.country_id
+GROUP BY
+    1, 2, 3
+ORDER BY
+    2 ASC;
+```
+
 5. **Automation:**
-   - The `run.sh` script automates the ETL process, including data extraction, loading, and transformation.
+   - The `run.sh` script automates the ETL process, including data extraction, loading, and transformation when the docker container is created.
 
 ## Running the ETL Process Manually
 
