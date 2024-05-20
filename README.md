@@ -43,7 +43,7 @@ Follow the installation instructions for your OS:
 
 - **Windows:**
     ```bash
-    powershell -Command "Invoke-WebRequest -Uri https://install.astronomer.io/astro-cli-install.ps1 -OutFile install.ps1; ./install.ps1"
+    powershell -Command "winget install -e --id Astronomer.Astro"
     ```
 
 - **MacOS:**
@@ -53,7 +53,7 @@ Follow the installation instructions for your OS:
 
 - **Linux:**
     ```bash
-    curl -sSL https://install.astronomer.io | sudo bash
+    curl -sSL install.astronomer.io | sudo bash -s
     ```
 
 ## Steps to Execute
