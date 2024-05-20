@@ -1,31 +1,17 @@
 version: '3.8'
 
 services:
-  db:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: gdp_data
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - postgresql_data:/var/lib/postgresql/data
-      - ./db/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
-    ports:
-      - "5432:5432"
-    networks:
-      - db
-
   app:
     build: .
-    depends_on:
-      - db
     volumes:
       - .:/app
-    command: ["./run.sh"]
     environment:
-      PGPASSWORD: postgres
-    networks:
-      - db
+      DB_NAME: gdp_data
+      DB_USER: cloudwalk
+      DB_PASSWORD: EzOiDSqfrdy5cbkXhr2LQHN6eB1SzE3O
+      DB_HOST: dpg-cp4lc5779t8c73ei01pg-a.oregon-postgres.render.com
+      DB_PORT: 5432
+    command: ["./run.sh"]
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -35,19 +21,17 @@ services:
     ports:
       - "5050:80"
     depends_on:
-      - db
+      - app
     volumes:
       - pgadmin_data:/var/lib/pgadmin
       - ./pgadmin/setup_pgadmin.sh:/docker-entrypoint-initdb.d/setup_pgadmin.sh
     networks:
-      - db
+      - default
 
 networks:
-  db:
+  default:
     driver: bridge
 
 volumes:
-  postgresql_data:
-    driver: local
   pgadmin_data:
     driver: local

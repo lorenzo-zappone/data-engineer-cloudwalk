@@ -9,9 +9,9 @@ def connect_db():
     try:
         conn = psycopg2.connect(
             dbname='gdp_data',
-            user='postgres',
-            password='postgres',
-            host='db'
+            user='cloudwalk',
+            password='EzOiDSqfrdy5cbkXhr2LQHN6eB1SzE3O',
+            host='dpg-cp4lc5779t8c73ei01pg-a.oregon-postgres.render.com'
         )
         return conn
     except Exception as e:
@@ -54,7 +54,7 @@ def insert_data(conn, data):
                     VALUES (%s, %s, %s)
                     ON CONFLICT (country_id, year) DO NOTHING;
                 """, (country_id, year, value))
-                
+                    
         conn.commit()
     except Exception as e:
         print(f"Error inserting data: {e}")
