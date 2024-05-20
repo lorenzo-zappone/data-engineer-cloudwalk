@@ -43,7 +43,7 @@ Follow the installation instructions for your OS:
 
 - **Windows:**
     ```bash
-    powershell -Command "winget install -e --id Astronomer.Astro"
+    winget install -e --id Astronomer.Astro
     ```
 
 - **MacOS:**
