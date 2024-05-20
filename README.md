@@ -55,7 +55,6 @@ Follow the installation instructions for your OS:
     ```bash
     curl -sSL https://install.astronomer.io | sudo bash
     ```
----
 
 ## Steps to Execute
 
