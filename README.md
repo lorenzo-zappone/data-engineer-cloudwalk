@@ -92,11 +92,11 @@ Follow the installation instructions for your OS:
     
     - Add Server information
 
-    ![alt text](https://github.com/lorenzo-zappone/data-engineer-cloudwalk/blob/main/pics/step01.png)
+    ![alt text](https://github.com/lorenzo-zappone/data-engineer-cloudwalk/blob/main/pics/step-01.png)
 
-    ![alt text](https://github.com/lorenzo-zappone/data-engineer-cloudwalk/blob/main/pics/step02.png)
+    ![alt text](https://github.com/lorenzo-zappone/data-engineer-cloudwalk/blob/main/pics/step-02.png)
 
-    ![alt text](https://github.com/lorenzo-zappone/data-engineer-cloudwalk/blob/main/pics/step03.png)
+    ![alt text](https://github.com/lorenzo-zappone/data-engineer-cloudwalk/blob/main/pics/step-03.png)
 
 
 5. **Validate the tables in the database:**
