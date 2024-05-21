@@ -6,9 +6,9 @@ authors = ["lorenzo-analisou <167652280+lorenzo-zappone@users.noreply.github.com
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.12.1"
 requests = "^2.31.0"
-psycopg2 = "^2.9.9"
+psycopg2-binary = "^2.9.9"
 
 
 [build-system]
