@@ -284,12 +284,6 @@ If you need to run the ETL process manually, you can do so by executing the scri
     docker-compose exec app python scripts/load.py
     ```
 
-3. **Transform Data:**
-
-    ```bash
-    docker-compose exec db psql -U postgres -d gdp_data -f /files/transform.sql
-    ```
-
 ## Conclusion
 
 This project provides a robust and scalable solution for ingesting and transforming GDP data. The use of Docker ensures that the solution can be easily deployed and maintained. The documentation and clear structure make it easy to understand and extend.
