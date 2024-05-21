@@ -122,6 +122,26 @@ Follow the installation instructions for your OS:
 - The data is stored in two tables: `country` and `gdp`. The `country` table stores country metadata, while the `gdp` table stores GDP values for each year.
 - The ETL process assumes that the database and tables are initially empty. The `ON CONFLICT` clause in the `INSERT` statements ensures that duplicate entries are not created.
 
+- The `pivoted_gdp` view presents the last 5 years' GDP values for each country in billions.
+
+  **Assumption**: For the missing GDP values for Venezuela ("VE"), we assume there is no available data for those years.
+
+  | id  | name            | iso3_code | 2019  | 2020  | 2021  | 2022  | 2023  |
+  | --- | --------------- | --------- | ----- | ----- | ----- | ----- | ----- |
+  | AR  | Argentina       | ARG       | 447.75| 385.74| 487.90| 631.13| -     |
+  | BO  | Bolivia         | BOL       | 40.90 | 36.63 | 40.41 | 44.01 | -     |
+  | BR  | Brazil          | BRA       | 1873.29| 1476.11| 1649.62| 1920.10| -    |
+  | CL  | Chile           | CHL       | 278.60| 254.26| 316.58| 301.02| -     |
+  | CO  | Colombia        | COL       | 323.03| 270.15| 318.51| 343.62| -     |
+  | EC  | Ecuador         | ECU       | 108.11| 99.29 | 106.17| 115.05| -     |
+  | GY  | Guyana          | GUY       | 5.17  | 5.47  | 8.04  | 14.72 | -     |
+  | PY  | Paraguay        | PRY       | 37.93 | 35.43 | 39.95 | 41.72 | -     |
+  | PE  | Peru            | PER       | 228.33| 201.95| 223.72| 242.63| -     |
+  | SR  | Suriname        | SUR       | 4.02  | 2.91  | 3.08  | 3.62  | -     |
+  | UY  | Uruguay         | URY       | 62.05 | 53.67 | 61.41 | 71.18 | -     |
+  | VE  | Venezuela, RB   | VEN       | -     | -     | -     | -     | -     |
+
+
 ### Design Decisions
 
 1. **Dockerization:**
