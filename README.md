@@ -28,7 +28,7 @@ This project demonstrates a data ingestion and transformation pipeline that extr
 - Docker Compose
 - Poetry (for dependency management and packaging)
 - pgAdmin
-- Astro CLI **
+- **Astro CLI** to run Apache Airflow **
 
 ### Installing Prerequisites
 
@@ -89,11 +89,20 @@ Follow the installation instructions for your OS:
 
     - **Email:** `admin@admin.com`
     - **Password:** `admin`
+    
+    - Add Server information
+
+    ![alt text](https://github.com/lorenzo-zappone/data-engineer-cloudwalk/blob/main/pics/pgadmin.png)
+
+    ![alt text](https://github.com/lorenzo-zappone/data-engineer-cloudwalk/blob/main/pics/step02.png)
+
+    ![alt text](https://github.com/lorenzo-zappone/data-engineer-cloudwalk/blob/main/pics/step03.png)
+
 
 5. **Validate the tables in the database:**
 
     - Log in to pgAdmin.
-    - Connect to the PostgreSQL server using the credentials provided in the `docker-compose.yml` file.
+    - Connect to the PostgreSQL server using the credentials provided in the `docker-compose.yaml` file.
     - Verify that the `country` and `gdp` tables are created and populated.
 
 ## Optional configuration
@@ -113,6 +122,13 @@ Follow the installation instructions for your OS:
 
     - **User:** `admin`
     - **Password:** `admin`
+
+    ### Repeat step 4 to connect to the `cloud-DB` used with Apache Airflow.
+
+    - **Database:** `gdp_data`
+    - **User:** `cloudwalk`
+    - **Password:** `EzOiDSqfrdy5cbkXhr2LQHN6eB1SzE3O` 
+    - **Host** `dpg-cp4lc5779t8c73ei01pg-a.oregon-postgres.render.com`   
 
 ## Design Decisions and Assumptions
 
