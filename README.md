@@ -92,7 +92,7 @@ Follow the installation instructions for your OS:
     
     - Add Server information
 
-    ![alt text](https://github.com/lorenzo-zappone/data-engineer-cloudwalk/blob/main/pics/pgadmin.png)
+    ![alt text](https://github.com/lorenzo-zappone/data-engineer-cloudwalk/blob/main/pics/step01.png)
 
     ![alt text](https://github.com/lorenzo-zappone/data-engineer-cloudwalk/blob/main/pics/step02.png)
 
