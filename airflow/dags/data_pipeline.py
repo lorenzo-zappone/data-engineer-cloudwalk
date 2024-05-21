@@ -3,8 +3,9 @@ from airflow.decorators import task, dag
 from airflow.operators.python import BranchPythonOperator
 from airflow.operators.dummy import DummyOperator
 from airflow.utils.dates import days_ago
+from include.extract import extract_data
+from include.load import load_data, connect_db, create_tables, insert_data
 import json
-import requests
 import psycopg2
 from datetime import datetime
 
@@ -23,126 +24,66 @@ default_args = {
     tags=['cloudwalk'],
 )
 
-#TODO
-# add feature to check if the data is already loaded before continuing
-
 def gdp_data_pipeline():
     @task
-    def extract_data():
-        url = "https://api.worldbank.org/v2/country/ARG;BOL;BRA;CHL;COL;ECU;GUY;PRY;PER;SUR;URY;VEN/indicator/NY.GDP.MKTP.CD?format=json&per_page=50&page={}"
-        page = 1
-        all_data = []
-        while True:
-            response = requests.get(url.format(page))
-            data = response.json()
-            if not data[1]:  # If there is no more data
-                break
-            all_data.extend(data[1])
-            page += 1
-
-        with open('include/gdp_data.json', 'w', encoding='utf-8') as f:
-            json.dump(all_data, f)
+    def extract_data_task():
+        data = extract_data()
+        with open("json/gdp_data.json", "w") as f:
+            json.dump(data, f)
 
     @task
-    def load_data():
-        def connect_db():
-            return psycopg2.connect(
-                dbname='gdp_data',
-                user='cloudwalk',
-                password='EzOiDSqfrdy5cbkXhr2LQHN6eB1SzE3O',
-                host='dpg-cp4lc5779t8c73ei01pg-a.oregon-postgres.render.com'
-            )
-
-        with open('include/gdp_data.json', 'r', encoding='utf-8') as f:
+    def load_data_task():
+        with open("json/gdp_data.json", "r") as f:
             data = json.load(f)
-
         conn = connect_db()
-        cur = conn.cursor()
-
-        # Create tables if they don't exist
-        cur.execute("""
-                    CREATE TABLE IF NOT EXISTS country (
-                    id VARCHAR PRIMARY KEY,
-                    name VARCHAR NOT NULL,
-                    iso3_code VARCHAR NOT NULL,
-                );
-
-                CREATE TABLE IF NOT EXISTS gdp (
-                    country_id VARCHAR REFERENCES country(id),
-                    year INT,
-                    value NUMERIC,
-                    PRIMARY KEY (country_id, year));
-        """)
-        conn.commit()
-
-        # Insert data
-        for entry in data:
-            country_id = entry['country']['id']
-            country_name = entry['country']['value']
-            iso3_code = entry['countryiso3code']
-            year = entry['date']
-            value = entry['value']
-
-            cur.execute("""
-                INSERT INTO country (id, name, iso3_code)
-                VALUES (%s, %s, %s)
-                ON CONFLICT (id) DO NOTHING;
-            """, (country_id, country_name, iso3_code))
-
-            cur.execute("""
-                INSERT INTO gdp (country_id, year, value)
-                VALUES (%s, %s, %s)
-                ON CONFLICT (country_id, year) DO NOTHING;
-            """, (country_id, year, value))
-
-        conn.commit()
-        cur.close()
+        create_tables(conn)
+        insert_data(conn, data)
         conn.close()
 
     @task
-    def transform_data():
-        conn = psycopg2.connect(
-            dbname='gdp_data',
-            user='cloudwalk',
-            password='EzOiDSqfrdy5cbkXhr2LQHN6eB1SzE3O',
-            host='dpg-cp4lc5779t8c73ei01pg-a.oregon-postgres.render.com'
-        )
-        cur = conn.cursor()
-        cur.execute("""
-                DO $$
-                BEGIN
-                    IF NOT EXISTS (
-                        SELECT 1 
-                        FROM information_schema.views 
-                        WHERE table_name = 'pivoted_gdp'
-                    ) THEN
-                        EXECUTE '
-                        CREATE VIEW pivoted_gdp AS
-                        SELECT
-                            country.id,
-                            country.name,
-                            country.iso3_code,
-                            ROUND(MAX(CASE WHEN gdp.year = 2019 THEN gdp.value / 1e9 END), 2) AS "2019",
-                            ROUND(MAX(CASE WHEN gdp.year = 2020 THEN gdp.value / 1e9 END), 2) AS "2020",
-                            ROUND(MAX(CASE WHEN gdp.year = 2021 THEN gdp.value / 1e9 END), 2) AS "2021",
-                            ROUND(MAX(CASE WHEN gdp.year = 2022 THEN gdp.value / 1e9 END), 2) AS "2022",
-                            ROUND(MAX(CASE WHEN gdp.year = 2023 THEN gdp.value / 1e9 END), 2) AS "2023"
-                        FROM
-                            country
-                        JOIN
-                            gdp ON country.id = gdp.country_id
-                        GROUP BY
-                            1, 2, 3
-                        ORDER BY
-                            2 ASC;
-';
-                    END IF;
-                END $$;
-        """)
-        conn.commit()
-        cur.close()
-        conn.close()
+    def transform_data_task():
+        conn = connect_db()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                        DO $$
+                        BEGIN
+                            IF NOT EXISTS (
+                                SELECT 1 
+                                FROM information_schema.views 
+                                WHERE table_name = 'pivoted_gdp'
+                            ) THEN
+                                EXECUTE '
+                                CREATE VIEW pivoted_gdp AS
+                                SELECT
+                                    country.id,
+                                    country.name,
+                                    country.iso3_code,
+                                    ROUND(MAX(CASE WHEN gdp.year = 2019 THEN gdp.value / 1e9 END), 2) AS "2019",
+                                    ROUND(MAX(CASE WHEN gdp.year = 2020 THEN gdp.value / 1e9 END), 2) AS "2020",
+                                    ROUND(MAX(CASE WHEN gdp.year = 2021 THEN gdp.value / 1e9 END), 2) AS "2021",
+                                    ROUND(MAX(CASE WHEN gdp.year = 2022 THEN gdp.value / 1e9 END), 2) AS "2022",
+                                    ROUND(MAX(CASE WHEN gdp.year = 2023 THEN gdp.value / 1e9 END), 2) AS "2023"
+                                FROM
+                                    country
+                                JOIN
+                                    gdp ON country.id = gdp.country_id
+                                GROUP BY
+                                    1, 2, 3
+                                ORDER BY
+                                    2 ASC;
+                                ';
+                            END IF;
+                        END $$;
+                """)
+                conn.commit()
+        except Exception as e:
+            print(f"Error transforming data: {e}")
+            raise
+        finally:
+            conn.close()
 
-    extract_data() >> load_data() >> transform_data()
+
+    extract_data_task() >> load_data_task() >> transform_data_task()
 
 dag = gdp_data_pipeline()

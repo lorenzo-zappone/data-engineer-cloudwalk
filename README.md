@@ -106,10 +106,13 @@ Follow the installation instructions for your OS:
 7. **Start Airflow using Astro CLI:**
 
     ```bash
-    astro dev start
+    astro dev start --wait 3m
     ```
 
     - Open your browser and go to `http://localhost:8080` to access the Airflow web UI.
+
+    - **User:** `admin`
+    - **Password:** `admin`
 
 ## Design Decisions and Assumptions
 

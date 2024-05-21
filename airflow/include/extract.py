@@ -26,7 +26,3 @@ def extract_data():
 
     return data
 
-if __name__ == "__main__":
-    data = extract_data()
-    with open("json/gdp_data.json", "w") as f:
-        json.dump(data, f)

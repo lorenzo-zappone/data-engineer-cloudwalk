@@ -1,7 +1,7 @@
 import json
 import psycopg2
 
-def load_data(filename='gdp_data.json'):
+def load_data(filename='json/gdp_data.json'):
     with open(filename, 'r', encoding='utf-8') as f:
         return json.load(f)
 
@@ -9,9 +9,9 @@ def connect_db():
     try:
         conn = psycopg2.connect(
             dbname='gdp_data',
-            user='cloudwalk',
-            password='EzOiDSqfrdy5cbkXhr2LQHN6eB1SzE3O',
-            host='dpg-cp4lc5779t8c73ei01pg-a.oregon-postgres.render.com'
+            user='postgres',
+            password='postgres',
+            host='db'
         )
         return conn
     except Exception as e:
