@@ -124,7 +124,7 @@ Follow the installation instructions for your OS:
 
 - The `pivoted_gdp` view presents the last 5 years' GDP values for each country in billions.
 
-  **Assumption**: For the missing GDP values for Venezuela ("VE"), we assume there is no available data for those years.
+  **Assumption**: For the missing GDP values for Venezuela ("VE"), we assume there is no available data for those years and also 2023.
 
   | id  | name            | iso3_code | 2019  | 2020  | 2021  | 2022  | 2023  |
   | --- | --------------- | --------- | ----- | ----- | ----- | ----- | ----- |
