@@ -71,7 +71,7 @@ Follow the installation instructions for your OS:
     poetry install
     ```
 
-** Note that if you encounter any error you have to `select the correct python interpreter`.
+** Note that if you encounter any error you have to `select the correct python interpreter` `python 3.12.1`. It can be used with pyenv.
 
 3. **Build and run the Docker containers:**
 
