@@ -27,7 +27,6 @@ This project demonstrates a data ingestion and transformation pipeline that extr
 - Docker
 - Docker Compose
 - Poetry (for dependency management and packaging)
-- pgAdmin
 - **Astro CLI** to run Apache Airflow **
 
 ### Installing Prerequisites
