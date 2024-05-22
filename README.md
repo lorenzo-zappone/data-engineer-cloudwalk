@@ -127,7 +127,9 @@ Follow the installation instructions for your OS:
     - **Database:** `gdp_data`
     - **User:** `cloudwalk`
     - **Password:** `EzOiDSqfrdy5cbkXhr2LQHN6eB1SzE3O` 
-    - **Host** `dpg-cp4lc5779t8c73ei01pg-a.oregon-postgres.render.com`   
+    - **Host** `dpg-cp4lc5779t8c73ei01pg-a.oregon-postgres.render.com`
+  
+   *** Data insertion with Apache Airflow may take `up to 5 minutes` because of the `free tier database` deployed on Render.
 
 ## Design Decisions and Assumptions
 
@@ -331,7 +333,10 @@ if __name__ == '__main__':
 ```
 
 5. **Automation:**
-   - The `run.sh` script automates the ETL process, including data extraction, loading, and transformation when the docker container is created.
+   - The `run.sh` script automates the ETL process on the postgreSQL, including data extraction, loading, and transformation when the docker container is created.
+  
+6. **Airflow**
+   - The `gdp_data_pipeline` dag orchestrates the whole ETL process. As a plus, to simulate real world data pipeline applications, other than the postgreSQL locally with Docker, a database was deployed on Render (free tier - PostgreSQL). 
 
 ## Running the ETL Process Manually
 
