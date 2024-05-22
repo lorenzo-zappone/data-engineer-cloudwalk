@@ -360,6 +360,20 @@ If you need to run the ETL process manually, you can do so by executing the scri
     docker-compose exec app python scripts/transform.py
     ```
 
+## Shutdown Steps
+
+1. **Airflow**
+   - In the Airflow folder execute:
+     
+    ```bash
+    astro dev stop
+    ```    
+2. **PGAdmin and Local PostgreSQL**
+
+    ```bash
+    docker-compose down
+    ``` 
+
 ## Conclusion
 
 This project effectively demonstrates the end-to-end process of extracting, transforming, and loading GDP data for South American countries from the World Bank API into a PostgreSQL database. The use of Docker and Docker Compose ensures that the environment is consistent and easily replicable, making the setup straightforward and efficient. The inclusion of Poetry for dependency management further simplifies the process, ensuring that all necessary packages are installed seamlessly.
