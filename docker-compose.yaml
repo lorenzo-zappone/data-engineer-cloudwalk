@@ -21,7 +21,6 @@ services:
       - db
     volumes:
       - .:/app
-    command: ["./run.sh"]
     environment:
       PGPASSWORD: postgres
     networks:

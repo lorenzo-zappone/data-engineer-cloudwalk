@@ -8,4 +8,4 @@ python scripts/extract.py
 python scripts/load.py
 
 # Run the SQL transformation
-PGPASSWORD=postgres psql -h db -U postgres -d gdp_data -f scripts/transform.sql
+python scripts/transform.py

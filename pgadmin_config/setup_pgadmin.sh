@@ -1,24 +1,12 @@
 #!/bin/bash
 
-# Start PgAdmin in the background
-/entrypoint.sh &
+# Set up the pgAdmin tool
 
-# Wait for PgAdmin to start
-sleep 10
+# Create a new server group
+echo "CREATE SERVER GROUP gdp_data_group;" | psql -h db_app -U postgres gdp_data
 
-# Define connection settings
-SERVER_NAME="PostgreSQL Database"
-SERVER_HOSTNAME="db"
-SERVER_PORT=5432
-SERVER_USERNAME="postgres"
-SERVER_PASSWORD="postgres"
-SERVER_DBNAME="gdp_data"
+# Create a new server
+echo "CREATE SERVER gdp_data_server WITH DB_NAME='gdp_data', HOST='db', PORT='5432', USER='postgres', PASSWORD='postgres';" | psql -h db_app -U postgres gdp_data
 
-# Add a new server in PgAdmin
-curl -s --header "Content-Type: application/json" \
-  --request POST \
-  --data "{\"name\":\"${SERVER_NAME}\",\"host\":\"${SERVER_HOSTNAME}\",\"port\":${SERVER_PORT},\"username\":\"${SERVER_USERNAME}\",\"password\":\"${SERVER_PASSWORD}\",\"maintenance_db\":\"${SERVER_DBNAME}\"}" \
-  http://localhost:8085/setup-server
-
-# Keep the container running
-tail -f /dev/null
+# Add the server to the server group
+echo "ADD SERVER gdp_data_server TO SERVER GROUP gdp_data_group;" | psql -h db_app -U postgres gdp_data
