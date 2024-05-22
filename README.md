@@ -358,6 +358,16 @@ If you need to run the ETL process manually, you can do so by executing the scri
 
 ## Conclusion
 
-This project provides a robust and scalable solution for ingesting and transforming GDP data. The use of Docker ensures that the solution can be easily deployed and maintained. The documentation and clear structure make it easy to understand and extend.
+This project effectively demonstrates the end-to-end process of extracting, transforming, and loading GDP data for South American countries from the World Bank API into a PostgreSQL database. The use of Docker and Docker Compose ensures that the environment is consistent and easily replicable, making the setup straightforward and efficient. The inclusion of Poetry for dependency management further simplifies the process, ensuring that all necessary packages are installed seamlessly.
 
-If you have any questions or need further assistance, please feel free to contact zappone500@gmail.com.
+The project is well-structured, with clear scripts for each stage of the ETL process:
+
+1. **Data Extraction:** The `extract.py` script handles the retrieval of data from the World Bank API, including pagination to ensure comprehensive data collection.
+2. **Data Loading:** The `load.py` script inserts the extracted data into the PostgreSQL database, with safeguards to prevent duplicate entries.
+3. **Data Transformation:** The SQL script `transform.sql` creates a pivoted view to present the last five years of GDP data in a user-friendly format, facilitating easy analysis and reporting.
+
+Additionally, the project includes optional steps to integrate Apache Airflow for orchestrating the ETL workflow, demonstrating a forward-thinking approach to automation and scalability.
+
+By following the detailed setup and execution instructions, users can quickly deploy the solution and start analyzing the GDP data. The automation script `run.sh` further enhances usability by streamlining the ETL process. Also, the addition of Airflow can be used to integrate seemlessly with a cloud-based approach.
+
+In summary, this project provides a comprehensive, scalable, and easy-to-deploy solution for GDP data ingestion and transformation, making it a valuable tool for data engineers and analysts. If further assistance is needed, please contact zappone500@gmail.com.
