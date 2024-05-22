@@ -363,7 +363,7 @@ The project is well-structured, with clear scripts for each stage of the ETL pro
 
 1. **Data Extraction:** The `extract.py` script handles the retrieval of data from the World Bank API, including pagination to ensure comprehensive data collection.
 2. **Data Loading:** The `load.py` script inserts the extracted data into the PostgreSQL database, with safeguards to prevent duplicate entries.
-3. **Data Transformation:** The SQL script `transform.sql` creates a pivoted view to present the last five years of GDP data in a user-friendly format, facilitating easy analysis and reporting.
+3. **Data Transformation:** The SQL script `transform.py` creates a pivoted view to present the last five years of GDP data in a user-friendly format, facilitating easy analysis and reporting.
 
 Additionally, the project includes optional steps to integrate Apache Airflow for orchestrating the ETL workflow, demonstrating a forward-thinking approach to automation and scalability.
 
