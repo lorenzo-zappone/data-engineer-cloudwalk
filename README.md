@@ -67,8 +67,11 @@ Follow the installation instructions for your OS:
 2. **Install dependencies using Poetry:**
 
     ```bash
+    poetry shell
     poetry install
     ```
+
+** Note that if you encounter any error you have to `select the correct python interpreter`.
 
 3. **Build and run the Docker containers:**
 
