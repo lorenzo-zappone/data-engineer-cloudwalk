@@ -278,7 +278,7 @@ if __name__ == '__main__':
 ```
 
 4. **Data Transformation:**
-   - The `transform.sql` script creates a pivoted view `pivoted_gdp` to facilitate reporting. This view presents the last 5 years' GDP values in billions.
+   - The `transform.py` script creates a pivoted view `pivoted_gdp` to facilitate reporting. This view presents the last 5 years' GDP values in billions.
 
 ```python
 import psycopg2
