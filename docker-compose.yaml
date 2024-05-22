@@ -33,13 +33,10 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "5050:80"
-      - "8085:8085"  # Add port mapping for setup-server endpoint
     depends_on:
       - db
     volumes:
       - pgadmin_data:/var/lib/pgadmin
-      - ./pgadmin_config/setup_pgadmin.sh:/docker-entrypoint-initdb.d/setup_pgadmin.sh
-    command: ["sh", "/docker-entrypoint-initdb.d/setup_pgadmin.sh"]
     networks:
       - db
 
