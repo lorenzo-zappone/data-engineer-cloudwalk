@@ -12,7 +12,7 @@ This project demonstrates a data ingestion and transformation pipeline that extr
     ├── scripts
         ├── extract.py # Script to extract data from the World Bank API
         ├── load.py # Script to load data into the PostgreSQL database
-        └── transform.sql # SQL script to create the pivoted view
+        └── transform.py # Script to create the pivoted view
     ├── Dockerfile # Dockerfile for the application
     ├── docker-compose.yml # Docker Compose file to orchestrate services
     ├── requirements.txt # Python dependencies
